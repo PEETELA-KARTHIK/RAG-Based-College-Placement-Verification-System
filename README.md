@@ -1,6 +1,10 @@
 # 🎓 College RAG Assistant
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://peetela-karthik-rag-based-college-placement-verifica-app-tcvn4r.streamlit.app/)
+
 A production-ready Retrieval-Augmented Generation system for college placements and academic queries. Answers student questions **strictly** from uploaded institutional documents — no hallucination, no external knowledge.
+
+**Live Demo:** [Click here to view the app!](https://peetela-karthik-rag-based-college-placement-verifica-app-tcvn4r.streamlit.app/)
 
 ---
 
