@@ -1,13 +1,14 @@
 """
-Ollama-powered answer generator.
-Model: Configurable via LOCAL_LLM_MODEL
+Google Gemini-powered answer generator.
+Model: Configurable via GENERATION_MODEL
 Strict RAG behavior.
 """
 
-import requests
-import json
+from google import genai
+from google.genai import types
 from config import (
-    LOCAL_LLM_MODEL,
+    GOOGLE_API_KEY,
+    GENERATION_MODEL,
     NO_ANSWER_RESPONSE
 )
 
@@ -31,12 +32,17 @@ Question:
 Answer:"""
 
 
+def _get_client() -> genai.Client:
+    """Get a configured Gemini client."""
+    return genai.Client(api_key=GOOGLE_API_KEY)
+
+
 def generate_answer(
     question: str,
     context: str,
 ) -> str:
     """
-    Generate an answer using local Ollama instance.
+    Generate an answer using Google Gemini.
     """
     # Hard failure: no context means we cannot answer
     if not context.strip():
@@ -46,19 +52,16 @@ def generate_answer(
     full_prompt = f"{SYSTEM_PROMPT}\n\n{USER_PROMPT_TEMPLATE.format(context=context, question=question)}"
     
     try:
-        response = requests.post(
-            "http://localhost:11434/api/generate",
-            json={
-                "model": LOCAL_LLM_MODEL,
-                "prompt": full_prompt,
-                "stream": False
-            },
-            timeout=60 # Reasonable timeout for local inference
+        client = _get_client()
+        response = client.models.generate_content(
+            model=GENERATION_MODEL,
+            contents=full_prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.1,
+            )
         )
-        response.raise_for_status()
         
-        data = response.json()
-        answer = data.get("response", "").strip()
+        answer = response.text.strip()
         
         if not answer:
              return NO_ANSWER_RESPONSE
@@ -69,9 +72,6 @@ def generate_answer(
             
         return answer
 
-    except requests.exceptions.RequestException as e:
-        print(f"❌ Ollama connection error: {e}")
-        return "Error connecting to local LLM (Ollama). Ensure it is running."
     except Exception as e:
         print(f"❌ Generation error: {e}")
         return "An error occurred during generation."
