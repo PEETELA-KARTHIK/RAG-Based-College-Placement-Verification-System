@@ -9,7 +9,8 @@ from google.genai import types
 from config import (
     GOOGLE_API_KEY,
     GENERATION_MODEL,
-    NO_ANSWER_RESPONSE
+    NO_ANSWER_RESPONSE,
+    QUOTA_ERROR_RESPONSE
 )
 
 # ── RAG Logic ──────────────────────────────────────────────────────────────
@@ -73,5 +74,8 @@ def generate_answer(
         return answer
 
     except Exception as e:
+        error_msg = str(e).lower()
         print(f"❌ Generation error: {e}")
+        if "429" in error_msg or "quota" in error_msg or "exhausted" in error_msg:
+            return QUOTA_ERROR_RESPONSE
         return "An error occurred during generation."

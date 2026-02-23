@@ -21,6 +21,8 @@ try:
 except Exception:
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 
+print("DEBUG KEY STATUS:", bool(GOOGLE_API_KEY))
+
 EMBEDDING_MODEL = "models/gemini-embedding-001"
 GENERATION_MODEL = "gemini-2.0-flash"
 
